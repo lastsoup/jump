@@ -1,107 +1,78 @@
 var INTERSECTED;
-//几何体https://www.cnblogs.com/w-wanglei/p/6741587.html；https://blog.csdn.net/zhulx_sz/article/details/78798937
-//相机https://www.cnblogs.com/v-weiwang/p/6072235.html
-//材质https://segmentfault.com/a/1190000014639067
-var host="model/rocket";
-var jsonModels= [{
-    src: host+"/1/1",
-    emissive: host+"/1/1.jpg",
-    name: "fh"
-},
-{
-    src: host+"/2/2",
-    emissive: host+"/2/2.jpg",
-    alpha: host+"/2/2a.jpg",
-    name: "2"
-},
-{
-    src: host+"/3/3",
-    emissive: host+"/3/3.jpg",
-    name: "3"
-},
-{
-    src: host+"/4/4",
-    emissive: host+"/4/4.jpg",
-    name: "4"
-},
-{
-    src: host+"/5/5",
-    emissive: host+"/5/5.jpg",
-    name: "5"
-},
-{
-    src: host+"/6/6",
-    emissive: host+"/6/6.jpg",
-    name: "6"
-},
-{
-    src: host+"/7/7",
-    emissive: host+"/7/7.jpg",
-    name: "7"
-},
-{
-    src: host+"/8/8",
-    emissive: host+"/8/8.jpg",
-    name: "8"
-},
-{
-    src: host+"/9/9",
-    emissive: host+"/9/9.jpg",
-    alpha: host+"/9/9a.jpg",
-    name: "9"
-},
-{
-    src: host+"/10/10",
-    emissive: host+"/10/10.jpg",
-    alpha: host+"/10/10a.jpg",
-    name: "10"
-},
-{
-    src: host+"/11/111",
-    emissive: host+"/11/111.jpg",
-    alpha: host+"/11/111a.jpg",
-    name: "111"
-},
-{
-    src: host+"/11/112",
-    emissive: host+"/11/112.jpg",
-    alpha: host+"/11/112a.jpg",
-    name: "112"
-},
-{
-    src: host+"/11/113",
-    emissive: host+"/11/113.jpg",
-    alpha: host+"/11/113a.jpg",
-    name: "113"
-},
-{
-    src: host+"/11/114",
-    emissive: host+"/11/114.jpg",
-    alpha: host+"/11/114a.jpg",
-    name: "114"
-},
-{
-    src: host+"/12/12",
-    emissive: host+"/12/12.jpg",
-    name: "12"
-},
-{
-    src: host+"/13/13",
-    emissive: host+"/13/13.jpg",
-    name: "13"
-},
-{
-    src: host+"/g/g",
-    emissive: host+"/g/gnr.jpg",
-    name: "g"
-},
-{
-    src: host+"/flame/flame",
-    emissive: host+"/flame/flame.png",
-    name: "flame"
+const vechicleColors = [0xa52523, 0xbdb638, 0x78b14b];
+const zoom = 2;
+const carFrontTexture = new Texture(40,80,[{x: 0, y: 10, w: 30, h: 60 }]);
+const carBackTexture = new Texture(40,80,[{x: 10, y: 10, w: 30, h: 60 }]);
+const carRightSideTexture = new Texture(110,40,[{x: 10, y: 0, w: 50, h: 30 }, {x: 70, y: 0, w: 30, h: 30 }]);
+const carLeftSideTexture = new Texture(110,40,[{x: 10, y: 10, w: 50, h: 30 }, {x: 70, y: 10, w: 30, h: 30 }]);
+
+function Texture(width, height, rects) {
+    const canvas = document.createElement( "canvas" );
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext( "2d" );
+    context.fillStyle = "#ffffff";
+    context.fillRect( 0, 0, width, height );
+    context.fillStyle = "rgba(0,0,0,0.6)";  
+    rects.forEach(rect => {
+      context.fillRect(rect.x, rect.y, rect.w, rect.h);
+    });
+    return new THREE.CanvasTexture(canvas);
 }
-];
-var mixer;
+
+function Wheel() {
+    const wheel = new THREE.Mesh( 
+      new THREE.BoxBufferGeometry( 12*zoom, 33*zoom, 12*zoom ), 
+      new THREE.MeshLambertMaterial( { color: 0x333333, flatShading: true } ) 
+    );
+    wheel.position.z = 6*zoom;
+    return wheel;
+}
+
+function Car() {
+    const car = new THREE.Group();
+    const color = vechicleColors[Math.floor(Math.random() * vechicleColors.length)];
+    
+    const main = new THREE.Mesh(
+      new THREE.BoxBufferGeometry( 60*zoom, 30*zoom, 15*zoom ), 
+      new THREE.MeshPhongMaterial( { color, flatShading: true } )
+    );
+    main.position.z = 12*zoom;
+    main.castShadow = true;
+    main.receiveShadow = true;
+    car.add(main)
+    
+    const cabin = new THREE.Mesh(
+      new THREE.BoxBufferGeometry( 33*zoom, 24*zoom, 12*zoom ), 
+      [
+        new THREE.MeshPhongMaterial( { color: 0xcccccc, flatShading: true, map: carBackTexture } ),
+        new THREE.MeshPhongMaterial( { color: 0xcccccc, flatShading: true, map: carFrontTexture } ),
+        new THREE.MeshPhongMaterial( { color: 0xcccccc, flatShading: true, map: carRightSideTexture } ),
+        new THREE.MeshPhongMaterial( { color: 0xcccccc, flatShading: true, map: carLeftSideTexture } ),
+        new THREE.MeshPhongMaterial( { color: 0xcccccc, flatShading: true } ), // top
+        new THREE.MeshPhongMaterial( { color: 0xcccccc, flatShading: true } ) // bottom
+      ]
+    );
+    cabin.position.x = 6*zoom;
+    cabin.position.z = 25.5*zoom;
+    cabin.castShadow = true;
+    cabin.receiveShadow = true;
+    car.add( cabin );
+    
+    const frontWheel = new Wheel();
+    frontWheel.position.x = -18*zoom;
+    car.add( frontWheel );
+  
+    const backWheel = new Wheel();
+    backWheel.position.x = 18*zoom;
+    car.add( backWheel );
+  
+    car.castShadow = true;
+    car.receiveShadow = false;
+    
+    return car;  
+  }
+
 var main = {
     init: function(){
         this.renderer = new THREE.WebGLRenderer({
@@ -126,19 +97,13 @@ var main = {
         this.raycaster = new THREE.Raycaster();
         this.clock = new THREE.Clock();
         //事件监听
-        document.addEventListener('mousemove', this.onDocumentMouseMove, false);
-        window.addEventListener('resize', this.onWindowResize, false);
-        //this.addTreeMod();
-        //this.addDamagedHelmetMod();
-        //this.addFbxMod();
+        //document.addEventListener('mousemove', this.onDocumentMouseMove, false);
+        //window.addEventListener('resize', this.onWindowResize, false);
         this.buildLightSystem();//添加光源线
         this.buildAuxSystem();//添加坐标系统
-        //this.addGround();
-        //this.buildMall();
-        this.addMap();//添加地图
-       
+        this.addGround();
+        this.vechicle=this.loadCar();
         this.animation();
-        //this.addLabel();
     },
     loadControls:function(){
         //创建场景Controls
@@ -147,6 +112,12 @@ var main = {
         controls.enableDamping = true
         controls.dampingFactor = 0.25
         controls.rotateSpeed = 0.35
+    },
+    loadCar:function(){
+        const vechicle = new Car();
+        vechicle.rotateX(-Math.PI/2);
+        this.scene.add(vechicle);
+        return vechicle;
     },
     buildLightSystem:function(){
         /*
@@ -180,8 +151,7 @@ var main = {
     animation:function(){
         //this.LightHelper.update(); 
         requestAnimationFrame(this.animation.bind(this));
-        var delta = this.clock.getDelta();
-        if ( mixer ) mixer.update( delta );
+        this.vechicle.position.x -=1;
         //this.render();
         this.renderer.render(this.scene, this.camera);
     },
@@ -203,54 +173,9 @@ var main = {
         }
         main.renderer.render(main.scene, main.camera);
     },
-    onDocumentMouseMove:function(){
-        event.preventDefault();
-        main.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        main.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-    },
-    onWindowResize: function(){
-        main.camera.aspect = window.innerWidth / window.innerHeight;
-        main.camera.updateProjectionMatrix();
-        main.renderer.setSize(window.innerWidth, window.innerHeight);
-    },
-    MultiMap:function(){
-        var subdivisions = {
-            'h' : 8,
-            'w' : 8
-        };
-        var zoom = 12;
-        var xTileBase = 2120;
-        var yTileBase = 1498;
-        var width=75;
-        var planeGeometry = new THREE.PlaneGeometry(width,width);
-        var group =new THREE.Group();
-        for (var row = 0; row < subdivisions.h; row++) {
-            for (var col = 0; col < subdivisions.w; col++) {
-                var texture = new THREE.TextureLoader().load( "http://b.tile.openstreetmap.org/" + zoom + "/" + (xTileBase + col) + "/" + (yTileBase - row) + ".png");
-                var planeMaterial = new THREE.MeshBasicMaterial({
-                    map:texture,
-                    depthWrite: false,
-                    side: THREE.DoubleSide,
-                    transparent: true
-                });
-                var mesh=new THREE.Mesh(planeGeometry, planeMaterial);
-                mesh.receiveShadow=true;
-                mesh.position.set(width*col,width*row,0);
-                group.add(mesh);
-            }
-        }
-        var half=-(300-width/2);
-        group.rotateX(-Math.PI / 2);
-        group.position.set(half,0,-half);
-        return group;
-    },
-    addMap:function(){
-        var object = this.MultiMap();
-        this.scene.add(object);
-    },
     // 构建平地
     addGround: function(){
-        var shape = new THREE.CubeGeometry(600, 10, 600);
+        var shape = new THREE.CubeGeometry(6000, 10, 6000);
         var material = new THREE.MeshLambertMaterial({
             color: 0x779966,
             emissive: 0x333333,
@@ -262,44 +187,6 @@ var main = {
         ground.receiveShadow=true;
         this.scene.add(ground);
         this.ground=ground;
-    },
-    // 构建商场建筑
-    buildMall:function(){
-        // 建一个空对象用来放场景物体
-        this.mall = new THREE.Object3D();
-        // 获取html中的svg地图路径
-        var svgShapes = document.querySelector('#svg_shapes')
-        var paths = svgShapes.querySelectorAll('path')
-        for (var i = 0; i < paths.length; i++) {
-            var d = paths[i].getAttribute('d')
-            // 使用插件将svg路径转化为THREE.js形状https://www.2cto.com/kf/201712/706141.html
-            var shape = transformSVGPathExposed(d)
-            // 将形状挤出
-            var svgGeometry = new THREE.ExtrudeGeometry(shape, {
-            amount: 100,
-            stes: 1,
-            bevelEnabled: false
-            })
-            // 由于平面转3D是竖直方向的, 需要旋转为水平方向
-            svgGeometry.rotateX(Math.PI / 2)
-            // 获取svg平面图每个模块对应的颜色
-            var color = paths[i].getAttribute('fill')
-            //MeshBasicMaterial：对光照无感，给几何体一种简单的颜色或显示线框。
-            //MeshLambertMaterial：这种材质对光照有反应，用于创建暗淡的不发光的物体。
-            //MeshPhongMaterial：这种材质对光照也有反应，用于创建金属类明亮的物体。
-            var svgMaterial = new THREE.MeshPhongMaterial({ color: color, opacity: 1,shininess:100 })
-            var svgMesh = new THREE.Mesh(svgGeometry, svgMaterial)
-            //svgMesh.position.set(0,75, 0);
-            svgMesh.name = paths[i].getAttribute('name');
-            svgMesh.castShadow=true;
-            svgMesh.receiveShadow=true;
-            this.mall.add(svgMesh);
-            
-        }
-        this.mall.translateX(-200)
-        this.mall.translateZ(-200)
-        this.mall.translateY(100)
-        this.scene.add(this.mall);
     },
     //辅助系统: 网格和坐标
     buildAuxSystem:function(){
@@ -315,144 +202,6 @@ var main = {
         this.scene.add(gridHelperx);
         this.scene.add(gridHelpery);
         this.scene.add(gridHelperz);
-    },
-    //添加每个店面的标签: 暂时用小方块代替
-    addLabel:function(){
-        var material = new THREE.MeshPhongMaterial({ color: 0x000000 })
-        // 遍历场景中的元素, 在元素上方添加方块: 未来添加具体标签
-        this.mall.children.forEach(function(elem){
-          var geometry = new THREE.BoxGeometry(2,20,2)
-          var Mesh = new THREE.Mesh(geometry, material);
-          Mesh.position.y = 100;
-          Mesh.position.x = elem.geometry.boundingSphere.center.x - 200
-          Mesh.position.z = elem.geometry.boundingSphere.center.z - 200
-          main.scene.add(Mesh);
-        })
-    },
-    addFbxMod:function(){
-      				// model
-				var loader = new THREE.FBXLoader();//'model/fbx/Samba Dancing.fbx'
-				loader.load( 'model/fbx/Samba Dancing.fbx', function ( object ) {
-
-					mixer = new THREE.AnimationMixer( object );
-
-					var action = mixer.clipAction( object.animations[ 0 ] );
-					action.play();
-
-					object.traverse( function ( child ) {
-
-						if ( child.isMesh ) {
-
-							child.castShadow = true;
-							child.receiveShadow = true;
-
-						}
-
-					} );
-
-					main.scene.add( object );
-				} );
-    },
-    addDamagedHelmetMod:function(){
-        _this = this;
-        var urls = [ 'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg' ];
-        var hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
-        //反射的环境图
-        var JPGCubeMap = new THREE.CubeTextureLoader().setPath( 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/cube/Bridge2/' ).load( urls );
-        var hdrCubeMap = new THREE.HDRCubeTextureLoader().setPath( 'textures/pisaHDR/').load(THREE.UnsignedByteType,hdrUrls);
-       
-        var loader = new THREE.GLTFLoader();
-        var path1='model/DamagedHelmet/DamagedHelmet.gltf';
-        loader.load(path1, function ( gltf ) {
-            gltf.scene.traverse( function ( child ) {
-                if ( child.isMesh ) {
-                    child.material.envMap = hdrCubeMap;
-                    child.scale.set(100, 100, 100);
-                    child.position.set(0,100, 0);
-                    child.castShadow= true;
-                    child.receiveShadow = true;
-                }
-            } );
-            _this.scene.add( gltf.scene );
-        }, undefined, function ( e ) {
-            console.error( e );
-        } );
-    },
-    addTreeMod: function(){
-        _this = this;
-        var mtlLoader = new THREE.MTLLoader();
-        mtlLoader.setCrossOrigin(true); 
-        var objLoader = new THREE.OBJLoader();
-        mtlLoader.load('model/tree/materials.mtl', function(material){
-            objLoader.load('model/tree/model.obj',function(object){
-                _this.tree = object;
-                var children = object.children;
-                for (var i = 0; i < children.length; i++) {
-                    children[i].castShadow= true;
-                    children[i].receiveShadow = true;
-                }
-                object.scale.set(100, 100, 100);
-                object.translateY(32);
-                _this.scene.add(object);
-            });
-            objLoader.setMaterials(material);
-        });
-    },
-    loadJsonModel:function(loader,model){
-        loader.load(model.src+".json",
-        function(geometry, materials) {
-            var material = new THREE.MeshPhongMaterial;
-            material.emissive = new THREE.Color(16777215);
-            material.color = new THREE.Color(657930);
-            material.emissiveMap = (new THREE.TextureLoader).load(model.emissive);
-            material.shading = THREE.FlatShading;
-            material.side = THREE.DoubleSide;       
-            if (model.alpha) {
-                material.alphaMap = (new THREE.TextureLoader).load(model.alpha);
-                material.alphaTest = .4;
-                material.transparent = true;
-            }
-            material.anisotropy = 16;
-            geometry.castShadow = !0;
-            geometry.receiveShadow = !1;
-            geom = new THREE.Mesh(geometry, material);
-            geom.name = model.name;
-            if (model.name == "g") {
-                material.shininess = 0
-            }
-            geom.rotateY(Math.PI/18);
-            geom.translateY(0.5);
-            geom.translateZ(-150);
-            main.scene.add(geom);
-        })
-    },
-    launch:function(){
-        var p=main.scene.getObjectByName("fh").position;
-    },
-    loading:function(){
-        THREE.DefaultLoadingManager.onStart = function(url, itemsLoaded, itemsTotal) {
-           
-        };
-
-        THREE.DefaultLoadingManager.onLoad = function() {
-           main.launch();
-        }
-
-        THREE.DefaultLoadingManager.onProgress = function(url, itemsLoaded, itemsTotal) {
-
-        }
-
-        THREE.DefaultLoadingManager.onError = function(url) {
-
-        }
-    },
-    addRocket:function(){
-        //https://zhuanlan.zhihu.com/p/35087860?edition=yidianzixun&utm_source=yidianzixun&yidian_docid=0Ig6wFNx
-        this.loading();
-        var loader = new THREE.JSONLoader();
-        jsonModels.forEach(function(model){
-          main.loadJsonModel(loader,model);
-        });
     }
 };
 

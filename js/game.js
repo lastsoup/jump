@@ -56,7 +56,7 @@ Game.prototype = {
     this._createCube() // 再加一个方块
     this._createJumper() // 加入游戏者jumper
     this._updateCamera() // 更新相机坐标
-
+    this.initOimoPhysics();
     var self = this
     var mouseEvents = (self.config.isMobile) ? {
         down: 'touchstart',
@@ -104,6 +104,11 @@ Game.prototype = {
     this._createCube()
     this._createJumper()
     this._updateCamera()
+  },
+  //添加Oimo物理引擎
+  initOimoPhysics:function(){
+    world = new OIMO.World(1 / 60, 1, 8);
+
   },
   // 游戏成功的执行函数, 外部传入
   addSuccessFn: function(fn) {

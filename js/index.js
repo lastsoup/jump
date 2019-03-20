@@ -105,6 +105,14 @@ var main = {
         this.vechicle=this.loadCar();
         this.animation();
     },
+    //添加Oimo物理引擎
+    initOimoPhysics:function(){
+
+    },
+     //添加Cannon物理引擎
+    initCannonPhysics:function(){
+
+    },
     loadControls:function(){
         //创建场景Controls
         var controls = new THREE.OrbitControls(this.camera, this.renderer.domElement)
@@ -192,8 +200,8 @@ var main = {
     buildAuxSystem:function(){
         var axisHelper = new THREE.AxesHelper(2000)
         this.scene.add(axisHelper);
-        var width=600;
-        var split=8;
+        var width=6000;
+        var split=60;
         var gridHelperx = new THREE.GridHelper(width,split)//长宽600等分60格1格等于10
         var gridHelpery = new THREE.GridHelper(width,split)
         var gridHelperz = new THREE.GridHelper(width,split)

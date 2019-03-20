@@ -47,6 +47,26 @@ var Game = function() {
   }
 };
 Game.prototype = {
+  //添加Oimo物理引擎
+  initOimoPhysics:function(){
+    this.world = new OIMO.World({ 
+      timestep: 1/60, 
+      iterations: 8, 
+      broadphase: 2, // 1 brute force, 2 sweep and prune, 3 volume tree
+      worldscale: 1, // scale full world 
+      random: true,  // randomize sample
+      info: false,   // calculate statistic or not
+      gravity: [0,-9.8,0] 
+  });
+    
+  },
+  populate(n){
+
+  },
+  //添加Cannon物理引擎
+  initCannonPhysics:function(){
+
+  },
   init: function() {
     this._checkUserAgent() // 检测是否移动端
     this._setCamera() // 设置摄像机位置
@@ -56,6 +76,7 @@ Game.prototype = {
     this._createCube() // 再加一个方块
     this._createJumper() // 加入游戏者jumper
     this._updateCamera() // 更新相机坐标
+    this._buildAuxSystem();//添加坐标系统
     this.initOimoPhysics();
     var self = this
     var mouseEvents = (self.config.isMobile) ? {
@@ -105,11 +126,6 @@ Game.prototype = {
     this._createJumper()
     this._updateCamera()
   },
-  //添加Oimo物理引擎
-  initOimoPhysics:function(){
-    world = new OIMO.World(1 / 60, 1, 8);
-
-  },
   // 游戏成功的执行函数, 外部传入
   addSuccessFn: function(fn) {
     this.successCallback = fn
@@ -117,6 +133,20 @@ Game.prototype = {
   // 游戏失败的执行函数, 外部传入
   addFailedFn: function(fn) {
     this.failedCallback = fn
+  },
+  _buildAuxSystem:function(){
+      var axisHelper = new THREE.AxesHelper(2000)
+      this.scene.add(axisHelper);
+      var width=600;
+      var split=8;
+      var gridHelperx = new THREE.GridHelper(width,split)//长宽600等分60格1格等于10
+      var gridHelpery = new THREE.GridHelper(width,split)
+      var gridHelperz = new THREE.GridHelper(width,split)
+      gridHelperx.rotateX(-Math.PI / 2);
+      gridHelperz.rotateZ(Math.PI / 2);
+      this.scene.add(gridHelperx);
+      this.scene.add(gridHelpery);
+      this.scene.add(gridHelperz);
   },
   // 检测是否手机端
   _checkUserAgent: function() {
@@ -439,6 +469,8 @@ Game.prototype = {
 
     var light = new THREE.AmbientLight(0xffffff, 0.3)
     this.scene.add(light)
+    var LightHelper = new THREE.DirectionalLightHelper(directionalLight);
+    this.scene.add(LightHelper);
   },
   _setCamera: function() {
     this.camera.position.set(100, 100, 100)

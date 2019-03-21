@@ -72,7 +72,27 @@ function Car() {
     
     return car;  
   }
+  function basicTexture(n){
+    var canvas = document.createElement( 'canvas' );
+    canvas.width = canvas.height = 64;
+    var ctx = canvas.getContext( '2d' );
+    var color;
+    if(n===0) color = "#3884AA";// sphere58AA80
+    if(n===1) color = "#61686B";// sphere sleep
+    if(n===2) color = "#AA6538";// box
+    if(n===3) color = "#61686B";// box sleep
+    if(n===4) color = "#AAAA38";// cyl
+    if(n===5) color = "#61686B";// cyl sleep
+    ctx.fillStyle = color;
+    ctx.fillRect(0, 0, 64, 64);
+    ctx.fillStyle = "rgba(0,0,0,0.2)";
+    ctx.fillRect(0, 0, 32, 32);
+    ctx.fillRect(32, 32, 32, 32);
 
+    var tx = new THREE.Texture(canvas);
+    tx.needsUpdate = true;
+    return tx;
+}
 var main = {
     init: function(){
         this.renderer = new THREE.WebGLRenderer({
@@ -101,13 +121,110 @@ var main = {
         //window.addEventListener('resize', this.onWindowResize, false);
         this.buildLightSystem();//添加光源线
         this.buildAuxSystem();//添加坐标系统
-        this.addGround();
-        this.vechicle=this.loadCar();
+        //this.addGround();
+        //this.vechicle=this.loadCar();
+        this.initOimoPhysics();
         this.animation();
+        
+    },
+    animation:function(){
+        this.updateOimoPhysics();
+        requestAnimationFrame(this.animation.bind(this));
+        //this.vechicle.position.x -=1;
+        this.renderer.render(this.scene, this.camera);
     },
     //添加Oimo物理引擎
     initOimoPhysics:function(){
+       //创建物理世界
+    //     this.world = new OIMO.World({ 
+    //     timestep: 1/60, //物理世界的刷新频率，通常为60帧每秒
+    //     iterations: 8, 
+    //     broadphase: 2, // 碰撞检测算法类型，2号算法比较稳定
+    //     worldscale: 1, // 物理世界的缩放 
+    //     random: true,  // 是否使用随机样本
+    //     info: true,   // calculate statistic or not
+    //     gravity: [0,-9.8,0] //重力加速度的大小，x，y，z三个方向可设置
+    //    });
+       this.world = new OIMO.World(1 / 60, 2, 8);
+       this.populate();
+    },
 
+    populate:function(){
+        //向物理世界添加物理物体
+        // reset old
+        this.world.clear(); 
+        //add ground
+        // var ground = this.world.add({ 
+        //     type:'sphere', //  物理物体的类型，球体、长方体、圆柱体
+        //     size:[1000, 10, 1000], //物理物体的大小长、高、宽
+        //     pos:[0,0,0], // 物理物体的位置
+        //     rot:[0,0,90], // 物理物体的旋转角度
+        //     move:true, //物理物体是否是静态的
+        //     density: 1,//物理物体的密度，可以用来增加物体的质量
+        //     friction: 0.2,//物理物体的摩擦系数
+        //     restitution: 0.2,//物理物体的弹性系数
+        //     belongsTo: 1, // 物理物体所属的组别
+        //     collidesWith: 0xffffffff // The bits of the collision groups with which the shape collides.
+        // });
+        var gsize=[800, 10, 800];
+        this.ground = this.world.add({size:gsize,world:this.world,rot:[0,0,0]});
+        this.addStaticBox(gsize,[0,0,0],[0,0,0]);
+        //添加静态物体
+        this.bodies=[];
+        this.meshes=[];
+        var boxSize = 10;
+        var geometry = new THREE.BufferGeometry().fromGeometry( new THREE.SphereGeometry(1,16,10));
+        var material = new THREE["MeshBasicMaterial"]( {shininess: 10, map: basicTexture(0), name:'sph' } );
+        var body = this.world.add({
+            type: "sphere",
+            size: [boxSize],
+            pos: [0, 100, 0],
+            move: true,
+            world: this.world
+          });
+        var mesh = new THREE.Mesh(geometry, material);
+        mesh.scale.set(boxSize, boxSize, boxSize);
+        mesh.position.set(0, 10, 0);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        this.bodies.push(body);
+        this.meshes.push(mesh);
+        this.scene.add(mesh);
+    },
+    addBall:function(w){
+        var mesh=new THREE.Mesh(new THREE.SphereGeometry(1,16,10),
+        new THREE.MeshPhongMaterial( { color: 0xcccccc, flatShading: true }));
+        mesh.scale.set(w,w,w);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        this.scene.add(mesh);
+        return mesh;
+    },
+    addStaticBox:function(gsize, position, rotation){
+        var mesh = new THREE.Mesh(new THREE.BoxGeometry(1,1,1), new THREE.MeshLambertMaterial({
+            color: 0x779966,
+            emissive: 0x333333,
+        }));
+        mesh.scale.set(gsize[0],gsize[1],gsize[2]);
+        mesh.position.set(position[0],position[1],position[2]);
+        mesh.rotation.set(rotation[0],rotation[1],rotation[2]);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        this.scene.add( mesh );
+        return mesh;
+    },
+    updateOimoPhysics:function(){
+        if(this.world==null) return;
+        this.world.step();
+        for (var i = 0; i < this.bodies.length; i++) {
+            var b = this.bodies[i];
+            var m = this.meshes[i];
+        
+            if (!b.sleeping) {
+              m.position.copy(b.getPosition());
+              m.quaternion.copy(b.getQuaternion());
+            }
+          }
     },
      //添加Cannon物理引擎
     initCannonPhysics:function(){
@@ -156,13 +273,7 @@ var main = {
         this.loadControls()
       
     },
-    animation:function(){
-        //this.LightHelper.update(); 
-        requestAnimationFrame(this.animation.bind(this));
-        this.vechicle.position.x -=1;
-        //this.render();
-        this.renderer.render(this.scene, this.camera);
-    },
+
     render:function(){
         // 鼠标位置向摄像机位置发射一条射线
         main.raycaster.setFromCamera(main.mouse,main.camera);
@@ -183,7 +294,7 @@ var main = {
     },
     // 构建平地
     addGround: function(){
-        var shape = new THREE.CubeGeometry(6000, 10, 6000);
+        var shape = new THREE.CubeGeometry(1000, 10, 1000);
         var material = new THREE.MeshLambertMaterial({
             color: 0x779966,
             emissive: 0x333333,
@@ -200,8 +311,8 @@ var main = {
     buildAuxSystem:function(){
         var axisHelper = new THREE.AxesHelper(2000)
         this.scene.add(axisHelper);
-        var width=6000;
-        var split=60;
+        var width=1000;
+        var split=10;
         var gridHelperx = new THREE.GridHelper(width,split)//长宽600等分60格1格等于10
         var gridHelpery = new THREE.GridHelper(width,split)
         var gridHelperz = new THREE.GridHelper(width,split)

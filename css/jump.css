@@ -4,6 +4,21 @@ body{
   -webkit-user-select: none;
   -moz-user-select: none; 
 }
+
+
+a {
+	margin: 5px;
+	position: absolute;
+	text-decoration: none;
+  padding: 8px;
+  background: linear-gradient(#72797D , #3D4143);
+  color: #EEEEEE;
+	font-family: Arial;
+	border: 2px solid #72797D;
+	cursor: pointer;
+	z-index: 10;
+}
+
 .mask{
 	display: none;
 	flex-direction: column;

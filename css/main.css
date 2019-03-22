@@ -1,141 +1,37 @@
-html, body {
-  overflow: hidden;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
+* {  margin: 0; padding: 0; border: 0;}
+body{ background-color: #3D4143; overflow: hidden; color:#EEEEEE; font-family:Arial; font-size: 11px;}
+canvas{ position: absolute; top:0; left:0; pointer-events:auto; width:100%; height:100%; }
+input{ margin:0; padding:8px; background:linear-gradient(#72797D , #3D4143); color:#EEEEEE; font-family:Arial;}
+input[type='button'] {border: 2px solid #72797D; cursor: pointer;}
+input[type='button']:hover{border: 2px solid #72797D; cursor: pointer;background: #11BBFF; color:#000000;}
+#interface{ position: absolute; left:10px; top:10px; width:100%; height:20px; }
+#info{ pointer-events:none; position: absolute; left:10px; top:60px; width: 400px; height: 400px; font-family:monospace;}
+#link{ position: absolute; left:0; bottom:0; width:100%; height:30px; font-size:14px; word-spacing:10px; text-align:right; margin-left:-30px; font-weight:bold; }
+.link{ position: absolute; left:0; bottom:0; width:100%; height:30px; font-size:14px; word-spacing:10px; text-align:right; margin-left:-30px; font-weight:bold; }
+a {margin: 10px 10px;}
+a:link {color: #EEEEEE; text-decoration: none;}
+a:visited {color: #EEEEEE; text-decoration: none;}
+a:hover {color: #11BBFF; text-decoration: none;}
+a:active {color: #11BBFF; text-decoration: none;}
+
+#ribbon{
+    position: absolute; top:-50px; right:48px;
+    width:30px; height:200px; background:none; 
+    pointer-events:auto; cursor:pointer;
+    -ms-transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
 }
 
-#renderCanvas {
-  width: 100%;
-  height: 100%;
-  touch-action: none;
-}
-
-
-.btn-setting{
-  position: fixed;
-    min-height: 20px;
-    line-height: 20px;
-     right: 20px;
-    top: 7px;
-    z-index: 9;
-    padding:6px 10px;
-    background-color: #3b4146;
-    color: #fff;
-    border: 0;
-    cursor: pointer;
-     -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    outline: 0!important;
-}
-
-.btn-setting i{font-size: 20px;}
-
-button{margin: 2px;}
 
 a {
 	margin: 5px;
-	position: absolute;
 	text-decoration: none;
   padding: 8px;
   background: linear-gradient(#72797D , #3D4143);
   color: #EEEEEE;
 	font-family: Arial;
 	border: 2px solid #72797D;
-  cursor: pointer;
-  z-index: 10;
+	cursor: pointer;
+	z-index: 10;
 }
-
-
-@font-face {
-  font-family: 'iconfont';  /* project id 749083 */
-  src: url('//at.alicdn.com/t/font_749083_4y4u0wa9bb6.eot');
-  src: url('//at.alicdn.com/t/font_749083_4y4u0wa9bb6.eot?#iefix') format('embedded-opentype'),
-  url('//at.alicdn.com/t/font_749083_4y4u0wa9bb6.woff') format('woff'),
-  url('//at.alicdn.com/t/font_749083_4y4u0wa9bb6.ttf') format('truetype'),
-  url('//at.alicdn.com/t/font_749083_4y4u0wa9bb6.svg#iconfont') format('svg');
-}
-
-.iconfont{
-    font-family:"iconfont" !important;
-    font-size:16px;font-style:normal;
-    -webkit-font-smoothing: antialiased;
-    -webkit-text-stroke-width: 0.2px;
-    -moz-osx-font-smoothing: grayscale;}
-
-.aside-container{
-    right: 10px;
-    padding: 0px 20px 20px 20px;
-    position: absolute;
-    width: 200px;
-    height: auto;
-    top: 10px;
-    overflow: hidden;
-    z-index: 8;
-    background-color: #fff;
-    box-shadow: 0 0 3px #ccc;
-    font-size: 14px;
-    border-radius: 3px;
-    display: none;
-}
-
-.text-semibold{
-  color: #2b425b;
-  font-weight: 600;
-  font-size: 16px;
-}
-
-/*svg mall*/
-
-.info{
-  margin: 20px 0;
-  position: absolute;
-  text-align: center;
-  /*opacity: 0.2;*/
-  width:100%;
-}
-.info a{
-  display: block;
-  font-size: 16px;
-  line-height: 28px;
-  color: #ffffff;
-  text-decoration: none;
-}
-a.title{
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.svg-container{
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background: white;
-  width: 240px;
-  height: 300px;
-  overflow: hidden;
-  border: 1px solid #f2f2f2;
-  overflow: hidden;
-  border-radius: 6px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.3);
-}
-.svg-container svg{
-  position: absolute;
-  top: 100px;
-  left: 90px;
-  transform: scale(1.8);
-}
-.from{
-  position: absolute;
-  width: 100%;
-  text-align: center;
-  top: 0;
-}
-.from a{
-  color: black;
-}
-
-/*svg mall*/

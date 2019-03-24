@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>WEBGL物理引擎（仿跳一跳）</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=11" />
+
+<link rel="stylesheet" href="./css/main.css">
+<script type="text/javascript" src="./js/libs/three.js"></script>
+<script type="text/javascript" src="./js/libs/OrbitControls.js"></script>
+<script type="text/javascript" src="./js/loaders/d3_threeD.js"></script>
+<script src="./js/libs/cannon.min.js"></script>
+<script src="./js/libs/oimo.min.js"></script>
+<script src="./js/physics.js"></script>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<div id='interface'>
+    <a href="./index.html">仿跳一跳</a>
+    
+    <input type="button" value="Oimo.js" onClick=go(0)>
+    <input type="button" value="Connon.js" onClick=go(1)>
+    <input type="button" value="sphere" onClick=populate(1)>
+    <input type="button" value="box" onClick=populate(2)>
+    <input type="button" value="cylinder" onClick=populate(3)>
+    <input type="button" value="mix" onClick=populate(4)>
+    <input type="number" name="quantity" min="10" max="2000" value="10"  id='MaxNumber'>
+    <input type="submit" onClick=populate()>
+    <input type="number" name="gravity" min="-20" max="20" value="-10" id='gravity' onChange=gravity() >
+</div>
+<div id='info'></div>
+<script>
+main.init();
+function populate(n) {
+    main.populate(n);
+}
+function go(n){
+    main.flag=n;
+    main.init();
+}
+</script>
+</body>
+</html>

@@ -265,15 +265,19 @@ main={
         this.populate1(1);
     },
     addPGround:function(size,pos){
-        var groundShape = new CANNON.Plane();   // 形状
-        var groundBody = new CANNON.Body({  // 刚体
-            mass: 0,    // 质量，质量为0时为静态刚体
-            size:new CANNON.Vec3(size[0], size[1], size[2]),
-            position: new CANNON.Vec3(pos[0], pos[1], pos[2]),
-            shape: groundShape
-        })
-        //world.add(groundBody);
-        world.addBody(groundBody);
+        // var groundShape = new CANNON.Plane();   // 形状
+        // var groundBody = new CANNON.Body({  // 刚体
+        //     mass: 0,    // 质量，质量为0时为静态刚体
+        //     size:new CANNON.Vec3(size[0], size[1], size[2]),
+        //     position: new CANNON.Vec3(pos[0], pos[1], pos[2]),
+        //     shape: groundShape
+        // })
+        // //world.add(groundBody);
+        // world.addBody(groundBody);
+        var plane = new CANNON.Plane();
+        var groundBody = new CANNON.Body({ mass: 0 });
+        groundBody.addShape(plane);
+        world.add(groundBody);
     },
     addPBody:function(type,size,pos){
         var sphereBody = new CANNON.Body({
@@ -282,7 +286,7 @@ main={
             position: new CANNON.Vec3(pos[0], pos[1], pos[2]),
             shape: new CANNON.Sphere(type)
          });
-         world.addBody(sphereBody);
+         world.add(sphereBody);
          return sphereBody
     },
     populate1:function(n){
@@ -372,6 +376,7 @@ main={
                 if(mesh.material.name === 'cyl') mesh.material = mats.scyl;
             }
         }
+        infos.innerHTML ="";
     },
     TEXTURES:{
         gradTexture:function(color){

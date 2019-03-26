@@ -13676,7 +13676,6 @@ World.prototype.clearForces = function(){
         var b = bodies[i],
             force = b.force,
             tau = b.torque;
-
         b.force.set(0,0,0);
         b.torque.set(0,0,0);
     }

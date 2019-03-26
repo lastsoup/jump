@@ -4,7 +4,7 @@ canvas{ position: absolute; top:0; left:0; pointer-events:auto; width:100%; heig
 input{ margin:0; padding:8px; background:linear-gradient(#72797D , #3D4143); color:#EEEEEE; font-family:Arial;}
 input[type='button'] {border: 2px solid #72797D; cursor: pointer;}
 input[type='button']:hover{border: 2px solid #72797D; cursor: pointer;background: #11BBFF; color:#000000;}
-#interface{ position: absolute; left:10px; top:10px; width:100%; height:20px;  z-index: 2; }
+#interface{ position: absolute; left:10px; top:10px; width:100%; height:20px;  z-index: 4; }
 #info{ pointer-events:none; position: absolute; left:10px; top:60px; width: 400px; height: 400px; font-family:monospace;}
 #link{ position: absolute; left:0; bottom:0; width:100%; height:30px; font-size:14px; word-spacing:10px; text-align:right; margin-left:-30px; font-weight:bold; }
 .link{ position: absolute; left:0; bottom:0; width:100%; height:30px; font-size:14px; word-spacing:10px; text-align:right; margin-left:-30px; font-weight:bold; }

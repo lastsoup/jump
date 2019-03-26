@@ -9,8 +9,6 @@
 <link rel="stylesheet" href="./css/main.css">
 <script type="text/javascript" src="./js/libs/three.js"></script>
 <script type="text/javascript" src="./js/libs/OrbitControls.js"></script>
-<script type="text/javascript" src="./js/loaders/d3_threeD.js"></script>
-<script src="./js/libs/cannon.min.js"></script>
 <script src="./js/libs/oimo.min.js"></script>
 <script src="./js/physics.js"></script>
 </head>
@@ -19,9 +17,7 @@
 <div id='interface'>
     <i class="iconfont">&#xe601;</i>
     <a href="./index.html">仿跳一跳</a>
-    
-    <input type="button" value="Oimo.js" onClick=go(0)>
-    <input type="button" value="Connon.js" onClick=go(1)>
+    <a href="./demo1.html">Connon.js</a>
     <input type="button" value="sphere" onClick=populate(1)>
     <input type="button" value="box" onClick=populate(2)>
     <input type="button" value="cylinder" onClick=populate(3)>
@@ -37,9 +33,14 @@ function populate(n) {
     main.populate(n);
 }
 function go(n){
-    main.flag=n;
     main.init();
 }
+
+function gravity(g){
+    nG = document.getElementById("gravity").value
+    world.gravity = new OIMO.Vec3(0, nG, 0);
+}
+
 </script>
 </body>
 </html>

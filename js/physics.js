@@ -10,6 +10,7 @@ var geos = {};
 var mats = {};
 
 //oimo var
+var cannonDebugRenderer=null;
 var world = null;
 var bodys = [];
 
@@ -19,7 +20,7 @@ var type = 1;
 var infos;
 
 main={
-    flag:"1",
+    flag:"0",
     init:function(){
         //添加3D世界
         this.initTree3D();
@@ -28,10 +29,7 @@ main={
         //添加做表系统
         this.buildAuxSystem();
         //添加物理世界
-        if(this.flag=="0")
-           this.initOimoPhysics();
-        else
-           this.initCannonPhysics();
+       this.initOimoPhysics();
         this.loop();
     },
     initTree3D:function(){
@@ -99,10 +97,7 @@ main={
         mats['ground'] = new THREE[materialType]( {shininess: 10, color:0x3D4143, transparent:true, opacity:0.5 } );
     },
     loop:function(){
-        if(main.flag=="0")
-           main.updateOimoPhysics();
-        else
-           main.updateCannonPhysics();
+        main.updateOimoPhysics();
         renderer.render( scene, camera );
         requestAnimationFrame( main.loop );
     },
@@ -138,6 +133,9 @@ main={
     clearMesh:function(){
         var i=meshs.length;
         while (i--) scene.remove(meshs[ i ]);
+        i = grounds.length;
+        while (i--) scene.remove(grounds[ i ]);
+        grounds = [];
         meshs = [];
     },
     initOimoPhysics:function(){
@@ -200,14 +198,14 @@ main={
             if(t===1){
                 bodys[i] = world.add({type:'sphere', size:[w*0.5], pos:[x,y,z], move:true, world:world});
                 meshs[i] = new THREE.Mesh( geos.sphere, mats.sph );
-                meshs[i].scale.set( w*0.5, w*0.5, w*0.5 );
+                meshs[i].scale.set( w*0.5, w*0.5, w*0.5);
             } else if(t===2){
                 bodys[i] = world.add({type:'box', size:[w,h,d], pos:[x,y,z], move:true, world:world});
-                meshs[i] = new THREE.Mesh( geos.box, mats.box );
+                meshs[i] = new THREE.Mesh( geos.box, mats.box);
                 meshs[i].scale.set( w, h, d );
             } else if(t===3){
                 bodys[i] = world.add({type:'cylinder', size:[w*0.5,h], pos:[x,y,z], move:true, world:world});
-                meshs[i] = new THREE.Mesh( geos.cylinder, mats.cyl );
+                meshs[i] = new THREE.Mesh( geos.cylinder, mats.cyl);
                 meshs[i].scale.set( w*0.5, h, w*0.5 );
             }
 
@@ -254,129 +252,6 @@ main={
         }
 
         infos.innerHTML = world.getInfo();
-    },
-    initCannonPhysics:function(){
-        //建立物理世界
-        world = new CANNON.World();
-        // 設定重力場為 y 軸 -9.8 m/s²
-        world.gravity.set(0, -9.8, 0)
-        //碰撞偵測
-        world.broadphase = new CANNON.NaiveBroadphase();
-        this.populate1(1);
-    },
-    addPGround:function(size,pos){
-        // var groundShape = new CANNON.Plane();   // 形状
-        // var groundBody = new CANNON.Body({  // 刚体
-        //     mass: 0,    // 质量，质量为0时为静态刚体
-        //     size:new CANNON.Vec3(size[0], size[1], size[2]),
-        //     position: new CANNON.Vec3(pos[0], pos[1], pos[2]),
-        //     shape: groundShape
-        // })
-        // //world.add(groundBody);
-        // world.addBody(groundBody);
-        var plane = new CANNON.Plane();
-        var groundBody = new CANNON.Body({ mass: 0 });
-        groundBody.addShape(plane);
-        world.add(groundBody);
-    },
-    addPBody:function(type,size,pos){
-        var sphereBody = new CANNON.Body({
-            mass: 5, 
-            size:new CANNON.Vec3(size[0], size[1], size[2]),
-            position: new CANNON.Vec3(pos[0], pos[1], pos[2]),
-            shape: new CANNON.Sphere(type)
-         });
-         world.add(sphereBody);
-         return sphereBody
-    },
-    populate1:function(n){
-        var max = document.getElementById("MaxNumber").value;
-
-        if(n===1) type = 1
-        else if(n===2) type = 2;
-        else if(n===3) type = 3;
-        else if(n===4) type = 4;
-
-        // reset old
-        this.clearMesh();
-        world.clearForces();
-        bodys=[];
-
-        //添加平面
-        var gsize=[400, 10, 400],gpos=[0,0,0];
-        this.addPGround(gsize, gpos);
-        this.addStaticBox(gsize, gpos, [0,0,0]);
-
-        //add object
-        var x, y, z, w, h, d;
-        var i = max;
-        while (i--){
-            if(type===4) t = Math.floor(Math.random()*3)+1;
-            else t = type;
-            x = -100 + Math.random()*200;
-            z = -100 + Math.random()*200;
-            y = 100 + Math.random()*1000;
-            w = 10 + Math.random()*10;
-            h = 10 + Math.random()*10;
-            d = 10 + Math.random()*10;
-
-            if(t===1){
-                //bodys[i] = world.add({type:'sphere', size:[w*0.5], pos:[x,y,z], move:true, world:world});
-                bodys[i] = this.addPBody(1,[w*0.5, w*0.5, w*0.5],[x,y,z]);
-                meshs[i] = new THREE.Mesh( geos.sphere, mats.sph );
-                meshs[i].scale.set( w*0.5, w*0.5, w*0.5 );
-            } else if(t===2){
-                bodys[i] = this.addPBody(4,[w,h,d],[x,y,z]);
-                //bodys[i] = world.add({type:'box', size:[w,h,d], pos:[x,y,z], move:true, world:world});
-                meshs[i] = new THREE.Mesh( geos.box, mats.box );
-                meshs[i].scale.set( w, h, d );
-            } else if(t===3){
-                //bodys[i] = world.add({type:'cylinder', size:[w*0.5,h], pos:[x,y,z], move:true, world:world});
-                bodys[i] = this.addPBody(128,[w*0.5,h],[x,y,z]);
-                meshs[i] = new THREE.Mesh( geos.cylinder, mats.cyl );
-                meshs[i].scale.set( w*0.5, h, w*0.5 );
-            }
-
-            meshs[i].castShadow = true;
-            meshs[i].receiveShadow = true;
-
-            scene.add( meshs[i] );
-        }
-
-    },
-    updateCannonPhysics:function(){
-        if(world==null) return;
-        world.step(1/60);
-        var x, y, z, mesh, body, i = bodys.length;
-
-        while (i--){
-            body = bodys[i];
-            mesh = meshs[i];
-
-            if(body.sleepState!=2){
-
-                mesh.position.copy(body.position);
-                mesh.quaternion.copy(body.position);
-
-                // change material
-                if(mesh.material.name === 'sbox') mesh.material = mats.box;
-                if(mesh.material.name === 'ssph') mesh.material = mats.sph;
-                if(mesh.material.name === 'scyl') mesh.material = mats.cyl; 
-
-                // reset position
-                if(mesh.position.y<-100){
-                    x = -100 + Math.random()*200;
-                    z = -100 + Math.random()*200;
-                    y = 100 + Math.random()*1000;
-                    body.position.set(x,y,z);
-                }
-            } else {
-                if(mesh.material.name === 'box') mesh.material = mats.sbox;
-                if(mesh.material.name === 'sph') mesh.material = mats.ssph;
-                if(mesh.material.name === 'cyl') mesh.material = mats.scyl;
-            }
-        }
-        infos.innerHTML ="";
     },
     TEXTURES:{
         gradTexture:function(color){

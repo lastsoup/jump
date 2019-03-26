@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>平面与球例子</title>
+    <link rel="stylesheet" href="./css/main.css">
+</head>
+<body>
+    <div id='interface'>
+        <i class="iconfont">&#xe601;</i>
+        <a href="./demo.html">Oimo.js</a>
+        <input type="button" value="sphere" onClick=populate(1)>
+        <input type="button" value="box" onClick=populate(2)>
+        <input type="button" value="cylinder" onClick=populate(3)>
+    </div>
+    <canvas id="canvas"></canvas>
+    <script type="text/javascript" src="./js/libs/three.js"></script>
+    <script type="text/javascript" src="./js/libs/OrbitControls.js"></script>
+    <script src="./js/libs/cannon.min.js"></script>
+    <script type="text/javascript" src="./js/libs/CannonDebugRenderer.js"></script>
+    <script src="./js/physicsConnon.js"></script>
+    <script>
+      main.init();
+      function populate(n) {
+        main.populate(n);
+      }
+    </script>
+</body>
+</html>

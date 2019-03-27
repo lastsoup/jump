@@ -39,7 +39,10 @@ var main={
         },
         initTree3D:function(){
         var n = navigator.userAgent;
-        if (n.match(/Android/i) || n.match(/webOS/i) || n.match(/iPhone/i) || n.match(/iPad/i) || n.match(/iPod/i) || n.match(/BlackBerry/i) || n.match(/Windows Phone/i)){ isMobile = true;  antialias = false; document.getElementById("MaxNumber").value = 200; }
+        if (n.match(/Android/i) || n.match(/webOS/i) || n.match(/iPhone/i) || n.match(/iPad/i) || n.match(/iPod/i) || n.match(/BlackBerry/i) || n.match(/Windows Phone/i))
+        { 
+            isMobile = true;  antialias = false;
+        }
         canvas = document.getElementById("canvas");
         camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight,1, 5000)
         //camera.position.set(0, 5, 20)

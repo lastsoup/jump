@@ -1,3 +1,4 @@
+//利用
 var Game = function() {
   // 基本参数
   this.config = {
